@@ -1,0 +1,36 @@
+services:
+  mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mcp-server
+    ports:
+      - "5005:5005"
+    volumes:
+      - .:/app                            # code
+      - /home/spiloulou:/host/home:ro     # TON $HOME monté en lecture seule
+      # - ./token.json:/app/token.json:ro # (optionnel) token Gmail si présent
+    environment:
+      PYTHONUNBUFFERED: "1"
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:5005/"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  background-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mcp-background-worker
+    command: python background/worker.py
+    depends_on:
+      mcp-server:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - /home/spiloulou:/host/home:ro
+    restart: unless-stopped
+

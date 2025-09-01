@@ -1,0 +1,8 @@
+# Fichiers de secrets et de configuration locale
+.env
+token.json
+
+# Dossiers de cache et de dépendances Python
+__pycache__/
+venv/
+*.pyc
