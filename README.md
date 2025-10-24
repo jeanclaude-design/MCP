@@ -18,9 +18,27 @@ chmod +x launch.sh
 
 Contrôlez Blender 3D directement depuis l'API ! Créez, modifiez et rendez des modèles 3D via des commandes simples.
 
-**Voir le guide complet:** `BLENDER_MCP_GUIDE.md`
+**📚 Documentation complète:** `BLENDER_MCP_GUIDE.md`
 
-**Test rapide:**
+### Installation sur WSL
+
+Si vous utilisez WSL (Windows Subsystem for Linux), utilisez le script d'installation automatique :
+
+```bash
+./install_blender_wsl.sh
+```
+
+**Guide détaillé WSL:** `BLENDER_WSL_INSTALL.md`
+
+### Vérification de l'environnement
+
+```bash
+# Vérifier que tout est prêt
+./check_blender_wsl.sh
+```
+
+### Test rapide
+
 ```bash
 # Assurez-vous que Blender avec MCP est lancé
 python3 test_blender_mcp.py --simple
