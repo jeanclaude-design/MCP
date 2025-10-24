@@ -4,6 +4,7 @@ from agents.local_pdf_agent import search_pdf
 from agents.gmail_agent import send_email
 from agents.web_watch_agent import start_web_watch, get_web_watch_summary, list_web_watches
 from agents.tavily_agent import search_web_tavily
+from agents import blender_agent
 import logging
 
 router = APIRouter()
@@ -62,6 +63,69 @@ async def handle_command(req: dict):
         if not query:
             return {"status": "error", "message": "La requête est requise pour la recherche web Tavily."}
         return search_web_tavily(query)
+
+    # ===== Commandes Blender MCP =====
+
+    if cmd == "blender_create_object":
+        object_type = req.get("object_type", "CUBE")
+        name = req.get("name")
+        location = req.get("location")
+        scale = req.get("scale")
+        return blender_agent.create_object(object_type, name, location, scale)
+
+    if cmd == "blender_modify_object":
+        object_name = req.get("object_name")
+        if not object_name:
+            return {"status": "error", "message": "Le nom de l'objet est requis."}
+        location = req.get("location")
+        rotation = req.get("rotation")
+        scale = req.get("scale")
+        return blender_agent.modify_object(object_name, location, rotation, scale)
+
+    if cmd == "blender_apply_material":
+        object_name = req.get("object_name")
+        if not object_name:
+            return {"status": "error", "message": "Le nom de l'objet est requis."}
+        material_name = req.get("material_name", "Material")
+        color = req.get("color")
+        metallic = req.get("metallic", 0.0)
+        roughness = req.get("roughness", 0.5)
+        return blender_agent.apply_material(object_name, material_name, color, metallic, roughness)
+
+    if cmd == "blender_run_script":
+        script = req.get("script")
+        if not script:
+            return {"status": "error", "message": "Le script Python est requis."}
+        return blender_agent.run_python_script(script)
+
+    if cmd == "blender_get_scene_info":
+        return blender_agent.get_scene_info()
+
+    if cmd == "blender_control_camera":
+        location = req.get("location")
+        rotation = req.get("rotation")
+        lens = req.get("lens")
+        return blender_agent.control_camera(location, rotation, lens)
+
+    if cmd == "blender_render":
+        output_path = req.get("output_path", "/tmp/render.png")
+        resolution_x = req.get("resolution_x", 1920)
+        resolution_y = req.get("resolution_y", 1080)
+        samples = req.get("samples", 128)
+        return blender_agent.render_scene(output_path, resolution_x, resolution_y, samples)
+
+    if cmd == "blender_add_polyhaven_asset":
+        asset_type = req.get("asset_type")
+        asset_name = req.get("asset_name")
+        if not asset_type or not asset_name:
+            return {"status": "error", "message": "Le type et le nom de l'asset Poly Haven sont requis."}
+        return blender_agent.add_polyhaven_asset(asset_type, asset_name)
+
+    if cmd == "blender_configure_server":
+        host = req.get("host", "localhost")
+        port = req.get("port", 3000)
+        blender_agent.configure_blender_server(host, port)
+        return {"status": "success", "message": f"Serveur Blender MCP configuré sur {host}:{port}"}
 
     return {"status": "error", "message": "Commande inconnue"}
 
